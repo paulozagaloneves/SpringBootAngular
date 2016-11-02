@@ -36,7 +36,12 @@ public class JwtFilter extends GenericFilterBean {
 		}
 		
 		final String token = getRequestToken(request);
-
+		validateToken(token);
+		
+		chain.doFilter(req, res);
+	}
+	
+	private void validateToken(final String token) {
 		try {
 			final Claims claims = getTokenService().getClaims(token);
 			final DateTime expirationDate = new DateTime(claims.getExpiration());
@@ -51,8 +56,6 @@ public class JwtFilter extends GenericFilterBean {
 		} catch (final ExpiredJwtException e) {
 			throw new ServletException("Invalid token");
 		}
-
-		chain.doFilter(req, res);
 	}
 	
 	private boolean isLoginRequest(HttpServletRequest request) {
